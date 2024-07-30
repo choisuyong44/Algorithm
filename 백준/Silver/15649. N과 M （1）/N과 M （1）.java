@@ -2,42 +2,51 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	static int SZ, N, M;
-	static int[] arr;
-	static int[] isVisited;
-	static StringBuilder sb ;
+
+	static StringBuilder sb = new StringBuilder();
+	static int N;
+	static int M;
+	static boolean visit[];     
+	static int arr[];
 
 	public static void main(String[] args) throws IOException {
+
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
 		StringTokenizer st = new StringTokenizer(br.readLine());
 
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
 
+		visit = new boolean[N + 1];
 		arr = new int[M];
-		isVisited = new int[N + 1];
-
-		back(0);
 		
+		dfs(0,0);
+
+		System.out.println(sb);
 	}
 
-	public static void back(int arrIdx) {
-		if (arrIdx == M) {
-			sb = new StringBuilder();
-			for (int i : arr) {
-				sb.append(i).append(" ");
+	public static void dfs(int idx,int cnt) {
 
+		if (cnt == M) {
+			
+			for (int i = 0; i < M; i++) {
+				sb.append(arr[i] +" ");
 			}
-			System.out.println(sb);
+			
+			sb.append("\n");
 			return;
 		}
 
-		for (int i = 1; i <= N; i++) {
-			if (isVisited[i] == 0) {
-				isVisited[i] = 1;
-				arr[arrIdx] = i;
-				back(arrIdx + 1);
-				isVisited[i] = 0;
+		else {
+
+			for (int i = 1; i <= N; i++) {
+				if (!visit[i]) {
+					arr[cnt] = i;  
+					visit[i] = true;
+					dfs(i+1,cnt+1);
+					visit[i] = false;
+				}
 			}
 		}
 	}
