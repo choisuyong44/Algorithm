@@ -1,53 +1,52 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Main {
 
-	static int N;
-	static int M;
-
-	static int[] arr;
+	static int N, M;
 	static boolean[] visit;
-	static int[] temp;
-	
+	static int[] ans;
+	static int[] arr;
+
 	static StringBuilder sb = new StringBuilder();
-	
+
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
-
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
-		
+
 		arr = new int[N];
+		ans = new int[M];
 		visit = new boolean[N];
-		temp = new int[M];
-		
+
 		st = new StringTokenizer(br.readLine());
-		int idx =0;
-		while(st.hasMoreTokens()) {
-			arr[idx++] = Integer.parseInt(st.nextToken()); 
+		for (int i = 0; i < N; i++) {
+			arr[i] = Integer.parseInt(st.nextToken());
 		}
-		
+
 		Arrays.sort(arr);
-		dfs(0,0);
-		
+
+		per(0);
+
 		System.out.println(sb.toString());
-		
 	}
-	
-	public static void dfs(int idx,int cnt) {
-		if (cnt ==M) {
-			for(int i= 0;i<M;i++) {
-				sb.append(temp[i]+ " ");
+
+	public static void per(int cnt) {
+		if (cnt == M) {
+			for (int i = 0; i < M; i++) {
+				sb.append(ans[i]).append(" ");
 			}
 			sb.append("\n");
 			return;
 		}
-		
-		for(int i =0;i<N;i++) {
-			temp[cnt] = arr[i];
-			dfs(i,cnt+1);
+
+		for (int i = 0; i < N; i++) {
+			ans[cnt] = arr[i];
+			per(cnt + 1);
 		}
 	}
 }
