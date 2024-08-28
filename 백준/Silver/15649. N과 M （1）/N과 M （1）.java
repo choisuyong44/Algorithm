@@ -9,6 +9,8 @@ public class Main {
 	static int[] arr;
 	static boolean[] visit;
 	
+	static StringBuilder sb = new StringBuilder();
+	
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
@@ -19,14 +21,16 @@ public class Main {
 		visit= new boolean[N+1];
 		
 		per(0);
+		
+		System.out.println(sb.toString());
 	}
 
 	public static void per(int cnt) {
 		if(cnt == M) {
 			for(int i=0;i<M;i++) {
-				System.out.print(arr[i] + " ");
+				sb.append(arr[i]).append(" ");
 			}
-			System.out.println();
+			sb.append("\n");
 			return;
 		}
 		
@@ -38,6 +42,5 @@ public class Main {
 				visit[i] = false;
 			}
 		}
-	
 	}
 }
