@@ -2,51 +2,49 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	
-	static int[] arr;
+
+	static int[] small;
 	static int[] ans;
-	static int[] tmp;
-	
-	public static void main(String[] args) throws IOException{
-		
+	static boolean findAns = false;
+
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		
-		int cnt =0;
-		
-		arr = new int[9];
+
+		small = new int[9];
 		ans = new int[7];
-		
-		int idx = 0;
-		int sum = 0;
-		
-		for (int i=0;i<9;i++) {
-			arr[i] = Integer.parseInt(br.readLine());
-			sum += arr[i];
+
+		for (int i = 0; i < 9; i++) {
+			small[i] = Integer.parseInt(br.readLine());
 		}
 
-		int sum_twoFake = sum - 100;
-		
-		out : for(int i =0;i<8;i++) {
-			for(int j =i+1;j<9;j++) {
-				if(arr[i] +arr[j] == sum_twoFake){
-					for(int k=0;k<9;k++) {
-						if(k==i || k==j) {
-							continue;
-						}
-						else {
-							ans[idx++] = arr[k];
-						}
-					}
-                    break out;
-				}
-			}
-		}
-		
-		Arrays.sort(ans);
-		for(int i=0;i<7;i++) {
-			System.out.println(ans[i]);
-		}
-		
+		dfs(0, 0, 0);
 	}
-	
+
+	public static void dfs(int idx, int sum, int depth) {
+		// 이미 구하면 탈출
+		if (findAns)
+			return;
+
+		// 100 넘으면 탈출
+		if (sum > 100)
+			return;
+
+		// 7인데 합이 100
+		if (depth == 7) {
+			if (sum == 100) {
+				Arrays.sort(ans);
+				for (int i = 0; i < 7; i++) {
+					System.out.println(ans[i]);
+				}
+				findAns = true;
+			}
+            				
+            return;
+		}
+
+		for (int i = idx; i < 9; i++) {
+			ans[depth] = small[i];
+			dfs(i + 1, sum + small[i], depth + 1);
+		}
+	}
 }
