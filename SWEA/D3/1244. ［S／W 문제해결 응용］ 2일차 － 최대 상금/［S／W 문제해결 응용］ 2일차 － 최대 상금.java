@@ -33,7 +33,7 @@ public class Solution {
 			
 			max =0;
 			
-			combi(0);
+			combi(0,0);
 			
 			sb.append("#").append(T).append(" ").append(max).append("\n");
 		}
@@ -41,7 +41,7 @@ public class Solution {
 		System.out.println(sb.toString());
 	}
 
-	static void combi(int depth) {
+	static void combi(int idx,int depth) {
 		if (depth == cnt) {
 			int ans =0; int digit =1;
 			
@@ -54,10 +54,10 @@ public class Solution {
 			return;
 		}
 
-		for (int i = 0; i < s.length()-1; i++) {
+		for (int i = idx; i < s.length()-1; i++) {
 			for (int j = i+1 ; j < s.length(); j++) {
 				swap(i,j);
-				combi(depth+1);
+				combi(i,depth+1);
 				swap(i,j);
 			}
 		}
