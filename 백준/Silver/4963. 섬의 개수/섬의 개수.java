@@ -6,7 +6,7 @@ public class Main {
 	static Queue<int[]> q = new LinkedList<int[]>();
 
 	static boolean[][] visit;
-	static int[][] map;
+	static boolean[][] map;
 	static int w, h;
 
 	static int[] dr = { -1, -1, 0, 1, 1, 1, 0, -1 };
@@ -14,25 +14,26 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringBuilder sb = new StringBuilder();
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		w = Integer.parseInt(st.nextToken());
 		h = Integer.parseInt(st.nextToken());
 
 		while (w != 0 || h != 0) {
-			map = new int[h][w];
+			map = new boolean[h][w];
 			visit = new boolean[h][w];
 
 			for (int i = 0; i < h; i++) {
 				st = new StringTokenizer(br.readLine());
 				for (int j = 0; j < w; j++) {
-					map[i][j] = Integer.parseInt(st.nextToken());
+					if(Integer.parseInt(st.nextToken())==1) map[i][j] = true;
 				}
 			}
 
 			int cnt = 0;
 			for (int i = 0; i < h; i++) {
 				for (int j = 0; j < w; j++) {
-					if (!visit[i][j] && map[i][j] == 1) {
+					if (!visit[i][j] && map[i][j]) {
 						visit[i][j] = true;
 						bfs(i, j);
 						cnt++;
@@ -40,12 +41,14 @@ public class Main {
 				}
 			}
 
-			System.out.println(cnt);
+			sb.append(cnt).append("\n");
 
 			st = new StringTokenizer(br.readLine());
 			w = Integer.parseInt(st.nextToken());
 			h = Integer.parseInt(st.nextToken());
 		}
+		
+		System.out.println(sb.toString());
 	}
 
 	public static void bfs(int r, int c) {
@@ -61,7 +64,7 @@ public class Main {
 				int nc = k[1] + dc[d];
 
 				if (nr >= 0 && nr < h && nc >= 0 && nc < w) {
-					if (!visit[nr][nc] && map[nr][nc] == 1) {
+					if (!visit[nr][nc] && map[nr][nc]) {
 						q.add(new int[] { nr, nc });
 						visit[nr][nc] = true;
 					}
