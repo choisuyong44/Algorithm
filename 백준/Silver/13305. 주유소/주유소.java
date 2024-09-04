@@ -31,11 +31,7 @@ public class Main {
 		for(int i=1;i<N;i++) {
 			int tmp = Integer.parseInt(st.nextToken());
 			// 나보다 비싸면 -1로 set
-			if(k < tmp) {
-				city[i] = -1;
-			}
-			// 나보다 비싸면 
-			else {
+			if(k > tmp) {
 				city[i] = tmp;
 				k = tmp;
 			}
@@ -49,11 +45,11 @@ public class Main {
 			if(now == city.length-1) break;
 			
 			// 유효한 기름값이라면
-			if(city[now] !=-1) {
+			if(city[now] !=0) {
 				min_cost = city[now];
 			}
 			
-			sum_cost += min_cost*dist[now];
+			sum_cost += (long)min_cost*(long)dist[now];
 			now++;
 		}
 		
