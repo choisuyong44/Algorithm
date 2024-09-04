@@ -7,21 +7,42 @@ import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class Solution {
+	
+	static class Edge implements Comparable<Edge>{
+		int v1;
+		int v2;
+		long w;
+		
+		public Edge(int v1, int v2, long w) {
+			super();
+			this.v1 = v1;
+			this.v2 = v2;
+			this.w = w;
+		}
 
+		@Override
+		public int compareTo(Edge o) {
+			if(this.w > o.w) return 1;
+			else if(this.w < o.w) return -1;
+			else return 0;
+		}
+
+		@Override
+		public String toString() {
+			return "Edge [v1=" + v1 + ", v2=" + v2 + ", w=" + w + "]";
+		}
+	}
+
+	final static int X = 0;
+	final static int Y = 1;
+	final static int REP =2;
+	
 	static int N;
 	static double E;
-
-	static final int A = 0;
-	static final int B = 1;
-	static final int W = 2;
-
-	static final int X = 0;
-	static final int Y = 1;
-	static final int REP = 2;
-
-	static int[][] points;
-	static long[][] edge;
-
+	
+	static int[][] point;
+	static Edge[] edge;
+	
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringBuilder sb = new StringBuilder();
@@ -30,84 +51,74 @@ public class Solution {
 		int TC = Integer.parseInt(br.readLine());
 
 		for (int T = 1; T < TC + 1; T++) {
+			
 			N = Integer.parseInt(br.readLine());
-
-			edge = new long[N * (N - 1)][3];
-			points = new int[N + 1][3];
-
-			// X 받기
-			st = new StringTokenizer(br.readLine());
-			for (int i = 1; i <= N; i++) {
-				points[i][X] = Integer.parseInt(st.nextToken());
-				points[i][REP] = i;
+			
+			// x, y, rep
+			point = new int[N][3];
+			
+			for(int i=0;i<N;i++) {
+				point[i][REP] = i;
 			}
 			
-			// Y 받기
+			edge = new Edge[N*(N-1)/2];
+			
+			// 입력
 			st = new StringTokenizer(br.readLine());
-			for (int i = 1; i <= N; i++) {
-				points[i][Y] = Integer.parseInt(st.nextToken());
+			for(int i=0;i<N;i++) {
+				point[i][X] = Integer.parseInt(st.nextToken());
 			}
+			
+			st = new StringTokenizer(br.readLine());
+			for(int i=0;i<N;i++) {
+				point[i][Y] = Integer.parseInt(st.nextToken());
+			}
+			
 			E = Double.parseDouble(br.readLine());
-
-			int idx = 0;
-			for (int i = 1; i < N; i++) {
-				for (int j = i + 1; j <= N; j++) {
-					edge[idx++] = new long[] { i, j, calDiff(points[i], points[j]) };
-				}
-			}
-
-			Arrays.sort(edge, new Comparator<long[]>() {
-				@Override
-				public int compare(long[] o1, long[] o2) {
-					if(o1[2] > o2[2]){
-						return 1;
-					}
-					else if(o1[2] < o2[2]){
-						return -1;
-					}
-					return 0;
-				}
-			});
 			
-			int cnt = 0;
+			// 간선 생성 N * (N-1) /2
+			int idx = 0;
+			for(int i=0;i<N-1;i++) {
+				for(int j=i+1;j<N;j++) {
+					edge[idx++] = new Edge(i, j, diff(i,j));
+				}
+			}
+			
+			// 간선 정렬
+			Arrays.sort(edge);
+			
+			// Union Find
+			int cnt =0;
 			long sum = 0;
-			for (long[] e : edge) {
-				if (find((int) e[A]) != find((int) e[B])) {
-					union((int) e[A], (int) e[B]);
-					sum += e[W];
+			for(Edge e : edge) {
+				if(find(e.v1)!=find(e.v2)) {
 					cnt++;
-					if (cnt == N - 1) {
-						break;
-					}
+					sum += e.w;
+					union(e.v1,e.v2);
+					if(cnt ==N-1) break;
 				}
 			}
 
-			long ans = Math.round(sum * E);
-
-			sb.append("#").append(T).append(" ").append(ans).append("\n");
+			sum = Math.round(E*sum);
+			sb.append("#").append(T).append(" ").append(sum).append("\n");
 		}
-
 		System.out.println(sb.toString());
 	}
-
+	
 	public static void union(int x, int y) {
 		x = find(x);
 		y = find(y);
-
-		if (x < y)
-			points[y][2] = x;
-		else
-			points[x][2] = y;
+		
+		if(x < y) point[y][REP] = x;
+		else point[x][REP] = y;
 	}
-
+	
 	public static int find(int x) {
-		if (x == points[x][2])
-			return x;
-		return points[x][2] = find(points[x][2]);
+		if(point[x][REP] == x) return x;
+		return point[x][REP] = find(point[x][REP]);
 	}
-
-	public static long calDiff(int[] v1, int[] v2) {
-		return (long)Math.abs(v1[X] - v2[X]) * (long)Math.abs(v1[X] - v2[X]) +
-				(long)Math.abs(v1[Y] - v2[Y]) * (long)Math.abs(v1[Y] - v2[Y]);
+	
+	public static long diff(int v1, int v2) {
+		return (long)(Math.pow(point[v1][X]-point[v2][X],2)+Math.pow(point[v1][Y]-point[v2][Y],2));
 	}
 }
