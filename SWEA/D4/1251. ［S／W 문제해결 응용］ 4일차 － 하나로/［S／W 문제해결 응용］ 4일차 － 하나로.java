@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class Solution {
-	
+
 	static class Edge implements Comparable<Edge>{
 		int v1;
 		int v2;
@@ -41,8 +41,7 @@ public class Solution {
 	static double E;
 	
 	static int[][] point;
-	
-	static PriorityQueue<Edge> pq = new PriorityQueue<>();
+	static Edge[] edge;
 	
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -52,12 +51,12 @@ public class Solution {
 		int TC = Integer.parseInt(br.readLine());
 
 		for (int T = 1; T < TC + 1; T++) {
-			pq.clear();
 			
 			N = Integer.parseInt(br.readLine());
 			
 			// x, y, rep
 			point = new int[N][3];
+			edge = new Edge[N*(N-1)/2];
 			
 			for(int i=0;i<N;i++) {
 				point[i][REP] = i;
@@ -77,22 +76,28 @@ public class Solution {
 			E = Double.parseDouble(br.readLine());
 			
 			// 간선 생성 N * (N-1) /2
+			int idx =0;
 			for(int i=0;i<N-1;i++) {
 				for(int j=i+1;j<N;j++) {
-					pq.add(new Edge(i, j, diff(i,j)));
+					edge[idx++] = (new Edge(i, j, diff(i,j)));
 				}
 			}
 			
+			Arrays.sort(edge);
+			
 			// Union Find
-			int cnt =0;
+			int cnt =0; idx =0;
 			long sum = 0;
 			while(cnt < N-1) {
-				Edge k = pq.poll();
+				Edge k = edge[idx++];
 				
 				if(find(k.v1)!=find(k.v2)) {
 					cnt++;
 					sum += k.w;
 					union(k.v1,k.v2);
+					if(cnt ==N-1) {
+						break;
+					}
 				}
 			}
 
