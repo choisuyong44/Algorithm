@@ -41,7 +41,8 @@ public class Solution {
 	static double E;
 	
 	static int[][] point;
-	static Edge[] edge;
+	
+	static PriorityQueue<Edge> pq = new PriorityQueue<>();
 	
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -51,6 +52,7 @@ public class Solution {
 		int TC = Integer.parseInt(br.readLine());
 
 		for (int T = 1; T < TC + 1; T++) {
+			pq.clear();
 			
 			N = Integer.parseInt(br.readLine());
 			
@@ -60,9 +62,7 @@ public class Solution {
 			for(int i=0;i<N;i++) {
 				point[i][REP] = i;
 			}
-			
-			edge = new Edge[N*(N-1)/2];
-			
+
 			// 입력
 			st = new StringTokenizer(br.readLine());
 			for(int i=0;i<N;i++) {
@@ -77,25 +77,22 @@ public class Solution {
 			E = Double.parseDouble(br.readLine());
 			
 			// 간선 생성 N * (N-1) /2
-			int idx = 0;
 			for(int i=0;i<N-1;i++) {
 				for(int j=i+1;j<N;j++) {
-					edge[idx++] = new Edge(i, j, diff(i,j));
+					pq.add(new Edge(i, j, diff(i,j)));
 				}
 			}
-			
-			// 간선 정렬
-			Arrays.sort(edge);
 			
 			// Union Find
 			int cnt =0;
 			long sum = 0;
-			for(Edge e : edge) {
-				if(find(e.v1)!=find(e.v2)) {
+			while(cnt < N-1) {
+				Edge k = pq.poll();
+				
+				if(find(k.v1)!=find(k.v2)) {
 					cnt++;
-					sum += e.w;
-					union(e.v1,e.v2);
-					if(cnt ==N-1) break;
+					sum += k.w;
+					union(k.v1,k.v2);
 				}
 			}
 
