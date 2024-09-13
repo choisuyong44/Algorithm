@@ -2,118 +2,95 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	
-	static int min =0;
-	
-	static int N,M;
-	
-	// 연결 확인
-	static int[] parent;
-	
-	static PriorityQueue<Road> pq = new PriorityQueue<Road>(new Comparator<Road>() {
-		@Override
-		public int compare(Road o1, Road o2) {
-			return o1.w-o2.w;
-		};
-	});
 
-	
+	static class Edge implements Comparable<Edge> {
+		int A;
+		int B;
+		int W;
+
+		public Edge(int a, int b, int w) {
+			A = a;
+			B = b;
+			W = w;
+		}
+
+		@Override
+		public int compareTo(Edge o) {
+			// TODO Auto-generated method stub
+			return this.W - o.W;
+		}
+
+		@Override
+		public String toString() {
+			return "Edge [A=" + A + ", B=" + B + ", W=" + W + "]";
+		}
+	}
+
+	static int ans;
+	static int V, E;
+	static int[] parent;
+
+	static PriorityQueue<Edge> pq = new PriorityQueue<Edge>();
+
 	public static void main(String[] args) throws IOException {
-		
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
+		StringTokenizer st;
+
+		st = new StringTokenizer(br.readLine());
+		V = Integer.parseInt(st.nextToken());
+		E = Integer.parseInt(st.nextToken());
 		
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		
-		// 간선 값 받기 - 0은 버림
-		parent = new int[N+1];
-		
-		for(int i=1;i<=N;i++) {
-			parent[i] =i;
-		}
-		
-		// v1, v2, w
-		for(int i=0;i<M;i++) {
+		for (int i = 0; i < E; i++) {
 			st = new StringTokenizer(br.readLine());
-			int v1 = Integer.parseInt(st.nextToken());
-			int v2 = Integer.parseInt(st.nextToken());
-			int w = Integer.parseInt(st.nextToken());
-			
-			pq.add(new Road(v1,v2,w));
+			pq.add(new Edge(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()),
+					Integer.parseInt(st.nextToken())));
+		}
+
+		// 마을이 2개면 연결할 필요가 없음
+		if(V==2) {
+			System.out.println(0);
+			return;
 		}
 		
-		// 연결하는 함수
-		link();
-		
-		System.out.println(min);
-		
+		solution();
 	}
-	
-	public static void link() {
-		int tmp =0; int cnt =0;
-		while(!pq.isEmpty()) {
+
+	public static void solution() {
+		// 대표노드 set
+		parent = new int[V + 1];
+		for (int i = 1; i <= V; i++) {
+			parent[i] = i;
+		}
+		
+		int cnt = 0; ans =0;
+		while (!pq.isEmpty()) {
+
+			Edge e = pq.poll();
 			
-			Road l = pq.poll();
-			
-			// 연결이 안되어있는 경우
-			if(!isLink(l.v1, l.v2)) {
+			if(find(e.A)!=find(e.B)) {
+				ans += e.W;
 				cnt++;
-				union(l.v1,l.v2);
-				min += l.w;
-				tmp = l.w;
-			}
+				union(e.A, e.B);
 			
-			else continue;
-			
-			// 모두 연결이 되었는 지 확인
-			if(cnt >= N-1 && checklinkedAll()) {
-				min -= tmp;
-				return;
+				// MST의 규칙에 따라 E = V-1 모두 연결 완료;
+				// 우리는 2개로 분리하고자 함
+				if(cnt == V-2) {
+					System.out.println(ans);
+					return;
+				}
 			}
 		}
-	}
-	
-	public static boolean checklinkedAll() {
-		int k = find(1);
-		for(int i=2;i<=N;i++) {
-			if(find(i)!=k) return false;
-		}
-		return true;
-	}
-	
-	public static void union(int x,int y) {
-		x = find(x);
-		y = find(y);
-		
-		if(x==y) return;
-		
-		if(x<y) parent[y] = x;
-		else parent[x] = y;
 	}
 	
 	public static int find(int x) {
-		if(parent[x] == x) return x;
+		if(x == parent[x]) return x;
 		return parent[x] = find(parent[x]);
 	}
-	
-	public static boolean isLink(int x, int y) {
+
+	public static void union(int x, int y) {
 		x = find(x);
 		y = find(y);
-		
-		if(x==y) return true;
-		else return false;
-	}
-	
-	static class Road{
-		int v1;
-		int v2;
-		int w;
-		
-		public Road(int v1, int v2, int w) {
-			this.v1 = v1;
-			this.v2 = v2;
-			this.w = w;
-		}
+		if (x < y) parent[y] = x;
+		else parent[x] = y;
 	}
 }
