@@ -3,140 +3,93 @@ import java.util.*;
 
 public class Main {
 
-	static class Search {
+	static class Move {
 		int r;
 		int c;
-		boolean hammer;
-		int move;
+		int cost;
+		int state;
 
-		public Search(int r, int c, boolean hammer, int move) {
+		public Move(int r, int c, int cost, int state) {
 			super();
 			this.r = r;
 			this.c = c;
-			this.hammer = hammer;
-			this.move = move;
+			this.cost = cost;
+			this.state = state;
 		}
-
-		@Override
-		public String toString() {
-			return "Search [r=" + r + ", c=" + c + ", hammer=" + hammer + ", move=" + move + "]";
-		}
-		
-		
 	}
 
 	static int N, M;
-	static int[][] map;
-
-	static boolean[][][] visit;
+	static boolean[][] map;
+	static boolean[][][] visited;
 
 	static int[] dr = { -1, 1, 0, 0 };
 	static int[] dc = { 0, 0, -1, 1 };
 
+	static int min = Integer.MAX_VALUE;
+	
 	public static void main(String[] args) throws IOException {
+		input();
+		visited= new boolean[N][M][2];
+		bfs(0, 0);
+		if(min == Integer.MAX_VALUE) min = -1;
+		System.out.println(min);
+	}
+
+	public static void bfs(int r, int c) {
+		Queue<Move> q = new LinkedList<Move>();
+		q.add(new Move(r,c,1,0));
+		
+		while(!q.isEmpty()) {
+			
+			Move k = q.poll();
+			
+			for(int d =0;d<4;d++) {
+
+				if(k.r== N-1 && k.c==M-1) {
+					min = k.cost;
+					return;
+				}
+				
+				int nr = k.r+dr[d];
+				int nc = k.c+dc[d];
+				
+				if(nr>=0 && nr<N && nc>=00 && nc<M && !visited[nr][nc][k.state]) {
+					
+					// 벽을 만났을 떄
+					if(!map[nr][nc]) {
+						// 기회 o
+						if(k.state == 0) { 
+							q.add(new Move(nr,nc,k.cost+1,1));
+							visited[nr][nc][1] = true;
+						}
+					}
+					
+					// 벽을 안만났을 떄
+					else {
+						q.add(new Move(nr,nc,k.cost+1,k.state));
+						visited[nr][nc][k.state] = true;
+					}
+				}
+			}
+		}
+	}
+
+	public static void input() throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st;
 
 		st = new StringTokenizer(br.readLine());
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
-
-		map = new int[N][M];
+		map = new boolean[N][M];
 		for (int i = 0; i < N; i++) {
 			String s = br.readLine();
 			for (int j = 0; j < M; j++) {
-				map[i][j] = s.charAt(j) - '0';
+				if (s.charAt(j) == '0')
+					map[i][j] = true;
+				else
+					map[i][j] = false;
 			}
-		}
-		
-		if(N==1 && M==1) {
-			System.out.println(1);
-			return;
-		}
-
-		if(!bfs(0, 0)) System.out.println(-1); 
-	}
-
-	public static boolean bfs(int r, int c) {
-		Queue<Search> q = new LinkedList<Search>();
-
-		visit = new boolean[N][M][2];
-
-		// hammer를 가지고 있고, movement는 0인 상태
-		q.add(new Search(r, c, true, 1));
-		
-		// 알아서 방문처리
-		checkVisit(r, c, true);
-
-		while (!q.isEmpty()) {
-
-			Search k = q.poll();
-
-			out: for (int d = 0; d < 4; d++) {
-				int nr = k.r + dr[d];
-				int nc = k.c + dc[d];
-
-				if (nr >= 0 && nr < N && nc >= 0 && nc < M) {
-
-					// 가장 먼저 방문한 경우
-					if (nr == N - 1 && nc == M - 1) {
-						System.out.println(k.move + 1);
-						return true;
-					}
-
-					// 벽을 만난 경우
-					if (map[nr][nc] == 1) {
-						// 해머가 있는 경우
-						if (k.hammer==true) {
-							checkVisit(nr, nc, false);
-							q.add(new Search(nr, nc, false, k.move + 1));
-						}
-
-						// 벽을 만났는 데 해머가 없는 경우;
-						// 해당 경우는 포기
-						else if (!k.hammer) {
-							continue out;
-						}
-					}
-
-					// 벽x
-					else {
-						// 방문하지 않은 경우
-						if (!isVisit(nr, nc, k.hammer)) {
-							checkVisit(nr, nc, k.hammer);
-							q.add(new Search(nr, nc, k.hammer, k.move + 1));
-						}
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	// 방문을 체크하는 함수
-	// hammer가 있으면 0번으로 탐색
-	// hammer가 없으면 1번으로 탐색
-	public static boolean isVisit(int r, int c, boolean hammer) {
-		if (hammer) {
-			if (visit[r][c][0] == true)
-				return true;
-			return false;
-		}
-
-		else {
-			if (visit[r][c][1] == true)
-				return true;
-			return false;
-		}
-	}
-
-	// 방문 처리를 하는 함수
-	public static void checkVisit(int r, int c, boolean hammer) {
-		if (hammer) {
-			visit[r][c][0] = true;
-
-		} else {
-			visit[r][c][1] = true;
 		}
 	}
 }
