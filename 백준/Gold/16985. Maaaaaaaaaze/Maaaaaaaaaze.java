@@ -25,12 +25,10 @@ public class Main {
 	static boolean[][][] ans;
 	static boolean[][][] map;
 
-	static boolean[][][] vistiedToBFS;
-	static boolean[] visitedToArray;
+	static boolean[][][] visitedCube;
+	static boolean[] visitedFloor;
 	static int[] orderDirection = new int[5];
 
-	static final int[][] START_POINT = { { 0, 0, 0 }, { 4, 0, 0 }, { 0, 4, 0 }, { 4, 4, 0 } };
-	static final int[][] END_POINT = { { 4, 4, 4 }, { 0, 4, 4 }, { 4, 0, 4 }, { 0, 0, 4 } };
 	static final int[] dx = { -1, 1, 0, 0, 0, 0 };
 	static final int[] dy = { 0, 0, -1, 1, 0, 0 };
 	static final int[] dz = { 0, 0, 0, 0, -1, 1 };
@@ -39,13 +37,12 @@ public class Main {
 		input();
 		simulation();
 
-		if (min == 9999)
-			min = -1;
+		if (min == 9999)min = -1;
 		System.out.println(min);
 	}
 
 	public static void simulation() {
-		visitedToArray = new boolean[5];
+		visitedFloor = new boolean[5];
 		perm(0);
 	}
 
@@ -57,118 +54,101 @@ public class Main {
 		}
 
 		for (int i = 0; i < 5; i++) {
-			if (!visitedToArray[i]) {
-				visitedToArray[i] = true;
+			if (!visitedFloor[i]) {
+				visitedFloor[i] = true;
 				ans[depth] = map[i];
 				perm(depth + 1);
-				visitedToArray[i] = false;
+				visitedFloor[i] = false;
 			}
 		}
 	}
 
-	// 5층에 대한 각각의 회전에 대한 순열
+	// 각각의 층에 대한 회전 정보
 	public static void decisionDirection(int depth) {
-		if (depth == 5) {
-			int min = 0;
-			// 원판 돌리기
-			for (int i = 0; i < 5; i++) {
-				rotate(i, 1, orderDirection[i]);
-			}
-
-			// 원판 돌리기
+		if(depth == 5) {
+			rotate(1);
 			bfs();
-
-			// 원판 원상복구
-			for (int i = 0; i < 5; i++) {
-				rotate(i, -1, orderDirection[i]);
-			}
-
+			rotate(-1);
 			return;
 		}
-
-		for (int i = 0; i < 4; i++) {
+		
+		for(int i =0;i<4;i++) {
 			orderDirection[depth] = i;
-			decisionDirection(depth + 1);
+			decisionDirection(depth+1);
 		}
 	}
 
 	public static void bfs() {
-
-		out: for (int idx = 0; idx < 4; idx++) {
-			int spx, spy, spz;
-			spx = START_POINT[idx][0];
-			spy = START_POINT[idx][1];
-			spz = START_POINT[idx][2];
-
-			int epx, epy, epz;
-			epx = END_POINT[idx][0];
-			epy = END_POINT[idx][1];
-			epz = END_POINT[idx][2];
-
-			// 둘 중하나가 false인 경우는 안됌
-			if (!ans[spz][spy][spx] || !ans[epz][epy][epx])
-				continue out;
-
-			q.clear();
-			q.add(new Move(spx, spy, spz, 0));
-			vistiedToBFS = new boolean[5][5][5];
-			vistiedToBFS[spz][spy][spx] = true;
-
-			int nx, ny, nz;
-			while (!q.isEmpty()) {
-
-				Move k = q.poll();
-
-				if (k.cost >= min) continue out;
-				if(min==12)return;
+		if(!ans[0][0][0] || !ans[4][4][4]) return;
+		
+		q.clear();
+		visitedCube = new boolean[5][5][5];
+		
+		q.add(new Move(0, 0, 0, 0));
+		visitedCube[0][0][0] = true;
+		
+		int nx,ny,nz;
+		while(!q.isEmpty()) {
+			
+			Move k = q.poll();
+			
+			if(min==12) return;
+			if(k.x==4 &&k.y==4&&k.z==4) {
+				min = Math.min(k.cost, min);
+				return;
+			}
+			
+			for(int d =0;d<6;d++) {
+				nx = k.x+dx[d];
+				ny = k.y+dy[d];
+				nz = k.z+dz[d];
 				
-				if (k.x == epx && k.y == epy && k.z == epz) {
-					min = Math.min(min, k.cost);
-					continue out;
+				if (isValid(nx,ny,nz)) {
+					q.add(new Move(nx,ny,nz,k.cost+1));
+					visitedCube[nz][ny][nx] = true;
 				}
+			}
+		}
+	}
+	
+	public static boolean isValid(int x, int y, int z) {
+		if( x>=0 && x<5 && y>=0 && y<5 && z>=0 && z<5 ) {
+			if(!visitedCube[z][y][x] && ans[z][y][x]) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-				for (int d = 0; d < 6; d++) {
-					nx = k.x + dx[d];
-					ny = k.y + dy[d];
-					nz = k.z + dz[d];
-
-					if (nx >= 0 && nx < 5 && ny >= 0 && ny < 5 && nz >= 0 && nz < 5) {
-						if (!vistiedToBFS[nz][ny][nx] && ans[nz][ny][nx]) {
-							q.add(new Move(nx, ny, nz, k.cost + 1));
-							vistiedToBFS[nz][ny][nx] = true;
-						}
+	public static void rotate(int direct) {
+		// 5층
+		for(int i =0;i<5;i++) {
+			
+			// orderDirection 횟수 만큼 회전
+			int rotateCnt = orderDirection[i];
+			if(direct == -1) rotateCnt = 4- rotateCnt;
+			
+			// 층에 대한 정보
+			boolean[][] temp = new boolean[5][5];
+			for(int j =0;j<rotateCnt;j++) {
+				
+				// temp에 넣기
+				for(int r = 0;r<5;r++) {
+					for(int c = 0;c<5;c++) {
+						temp[c][4-r] = ans[i][r][c];
+					}
+				}
+				
+				// 회전된 배열을 다시 원본 배열에 복사
+				for (int r = 0; r < 5; r++) {
+					for (int c = 0; c < 5; c++) {
+						ans[i][r][c] = temp[r][c];
 					}
 				}
 			}
 		}
 	}
 
-	public static void rotate(int f, int direct, int cnt) {
-		// direct가 -1이면 반시계 방향 회전 -> 시계 방향으로 cnt 값을 4에서 뺀 값으로 설정
-		if (direct == -1) {
-			cnt = 4 - cnt;
-		}
-
-		// cnt만큼 90도씩 회전
-		for (int i = 0; i < cnt; i++) {
-			boolean[][] temp = new boolean[5][5]; // 임시 배열
-
-			// 5x5 배열의 90도 회전 구현
-			for (int r = 0; r < 5; r++) {
-				for (int c = 0; c < 5; c++) {
-					// 90도 회전: ans[f][r][c]를 temp[c][4 - r]에 배치
-					temp[c][4 - r] = ans[f][r][c];
-				}
-			}
-
-			// 회전된 배열을 다시 원본 배열에 복사
-			for (int r = 0; r < 5; r++) {
-				for (int c = 0; c < 5; c++) {
-					ans[f][r][c] = temp[r][c];
-				}
-			}
-		}
-	}
 
 	public static void input() throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -186,5 +166,4 @@ public class Main {
 			}
 		}
 	}
-
 }
