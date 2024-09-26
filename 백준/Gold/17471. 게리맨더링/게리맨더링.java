@@ -22,9 +22,7 @@ public class Main {
 
 	public static void combi(int depth) {
 		if (depth == N) {
-			if (isValid()) {
-				minDiff();
-			}
+			if (isValid()) minDiff();
 			return;
 		}
 
@@ -35,13 +33,11 @@ public class Main {
 		// A에 안넣는 경우
 		teamA.remove(teamA.size() - 1);
 		combi(depth + 1);
-
 	}
 
 	public static boolean isValid() {
 		// 0. 팀 A size가 0이거나 N일 때
-		if (teamA.size() == 0 || teamA.size() == N)
-			return false;
+		if (teamA.size() == 0 || teamA.size() == N) return false;
 
 		// 1. 팀 2개로 나누기
 		divTeam();
@@ -71,13 +67,10 @@ public class Main {
 		}
 
 		// 3. LinkedAll
-		if (LinkedAll())
-			return true;
-		else
-			return false;
+		if (LinkedAll())return true;
+		else return false;
 	}
 
-	// fin
 	public static void divTeam() {
 		teamB.clear();
 		for (int i = 1; i <= N; i++) {
@@ -92,7 +85,6 @@ public class Main {
 		for (Integer i : teamA) {
 			if (A != find(i))return false;
 		}
-
 		for (Integer i : teamB) {
 			if (B != find(i))return false;
 		}
@@ -100,7 +92,6 @@ public class Main {
 		return true;
 	}
 
-	// fin
 	public static void minDiff() {
 		int sum = 0;
 		for (int i = 0; i < teamA.size(); i++) {
@@ -114,23 +105,18 @@ public class Main {
 		return;
 	}
 
-	// fin
 	public static int find(int x) {
 		if (parent[x] == x) return x;
 		return parent[x] = find(parent[x]);
 	}
 
-	// fin
 	public static void union(int x, int y) {
 		x = find(x);
 		y = find(y);
-		if (x < y)
-			parent[y] = x;
-		else
-			parent[x] = y;
+		if (x < y) parent[y] = x;
+		else parent[x] = y;
 	}
 
-	// fin
 	public static void input() throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st;
