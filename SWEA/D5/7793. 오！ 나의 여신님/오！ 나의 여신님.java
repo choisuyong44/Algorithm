@@ -67,14 +67,6 @@ public class Solution {
 			time++;
 		}
 	}
-	
-	public static void printMap() {
-		System.out.println("+++++++++++++++++++++++++++++");
-		for(int i =0;i<N;i++) {
-			System.out.println(Arrays.toString(map[i]));
-		}
-	}
-	
 	public static void input() throws IOException {
 		st = new StringTokenizer(br.readLine());
 		N = Integer.parseInt(st.nextToken());
