@@ -21,7 +21,7 @@ public class Solution {
 		for (int tc = 1; tc < T + 1; tc++) {
 			input();
 			simulation();
-			sb.append("#").append(tc).append(" ").append(ans==0? "GAME OVER":ans).append("\n");
+			sb.append("#").append(tc).append(" " ).append(ans==0? "GAME OVER":ans).append("\n");
 		}
 		System.out.println(sb.toString());
 	}
@@ -31,40 +31,47 @@ public class Solution {
 		int dq_size, sq_size;
 		while (!sq.isEmpty()) {
 			dq_size = dq.size();
-			sq_size = sq.size();
 			// devil
 			for (int i = 0; i < dq_size; i++) {
 				int[] dk = dq.poll();
+				int r = dk[0]; int c =dk[1];
 				for (int d = 0; d < 4; d++) {
-					int nr = dk[0] + dr[d];
-					int nc = dk[1] + dc[d];
+					int nr = r + dr[d];
+					int nc = c + dc[d];
 					if (nr >= 0 && nr < N && nc >= 0 && nc < M && map[nr][nc] == '.') {
 						dq.add(new int[] { nr, nc });
 						map[nr][nc] = '*';
 					}
 				}
 			}
+			sq_size = sq.size();
 			// suyeon
 			for (int i = 0; i < sq_size; i++) {
 				int[] sk = sq.poll();
-				
-				if(sk[0]==gr && sk[1]==gc) {
+				int r = sk[0]; int c =sk[1];	
+				if(r==gr && c==gc) {
 					ans = time;
 					return;
 				}
-				
 				for (int d = 0; d < 4; d++) {
-					int nr = sk[0] + dr[d];
-					int nc = sk[1] + dc[d];
+					int nr = r + dr[d];
+					int nc = c + dc[d];
 					if (nr >= 0 && nr < N && nc >= 0 && nc < M) {
 						if (!visited[nr][nc] && (map[nr][nc] == '.' || map[nr][nc] == 'D')) {
-							sq.add(new int[] { nr, nc });
 							visited[nr][nc] = true;
+							sq.add(new int[] { nr, nc });
 						}
 					}
 				}
 			}
 			time++;
+		}
+	}
+	
+	public static void printMap() {
+		System.out.println("+++++++++++++++++++++++++++++");
+		for(int i =0;i<N;i++) {
+			System.out.println(Arrays.toString(map[i]));
 		}
 	}
 	
@@ -79,12 +86,12 @@ public class Solution {
 			String s = br.readLine();
 			for (int j = 0; j < M; j++) {
 				map[i][j] = s.charAt(j);
-				if (map[i][j] == '*')
+				if (map[i][j] == '*') {
 					dq.add(new int[] { i, j });
-				else if (map[i][j] == 'S') {
+				}else if (map[i][j] == 'S') {
 					sq.add(new int[] { i, j });
 					visited[i][j] = true;
-					map[i][j] = '.';
+					map[i][j] ='.';
 				} else if (map[i][j] == 'D') {
 					gr = i;
 					gc = j;
