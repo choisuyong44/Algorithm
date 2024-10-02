@@ -1,100 +1,100 @@
 import java.io.*;
 import java.util.*;
 
-/*
- * -1: handOfDevil
- * 0 : 이동가능한 곳
- * 1 : 벽
- * 2 : 수연이
- * 3 : 여신
- */
 public class Solution {
-	static int N, M;
-	static int map[][];
-	static boolean visited[][];
-	static int RS, CS, RG, CG, nr, nc;
+
+	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	static StringBuilder sb = new StringBuilder();
+	static StringTokenizer st;
+
+	static int N, M, gr, gc;
+	static char[][] map;
+	static boolean[][] visited;
+	static Queue<int[]> sq = new LinkedList<int[]>();
+	static Queue<int[]> dq = new LinkedList<int[]>();
 	static int[] dr = { -1, 1, 0, 0 };
 	static int[] dc = { 0, 0, -1, 1 };
 	static int ans;
-	static Queue<int[]> q = new LinkedList<int[]>();
-	static Queue<int[]> dq = new LinkedList<int[]>();
+	
 	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringBuilder sb = new StringBuilder();
-		StringTokenizer st;
-
 		int T = Integer.parseInt(br.readLine());
-		for (int TC = 1; TC < T + 1; TC++) {
-			st = new StringTokenizer(br.readLine());
-			N = Integer.parseInt(st.nextToken());
-			M = Integer.parseInt(st.nextToken());
-			ans = Integer.MAX_VALUE;
-			map = new int[N][M];
-			visited = new boolean[N][M];
-			for (int i = 0; i < N; i++) {
-				String str = br.readLine();
-				for (int j = 0; j < M; j++) {
-					char tmp = str.charAt(j);
-					if (tmp == '*') map[i][j] = -1;
-					else if (tmp == '.')map[i][j] = 0;
-					else if (tmp == 'X')map[i][j] = 1;
-					else if (tmp == 'S') {RS = i;CS = j;} 
-					else if (tmp == 'D') {map[i][j] = 3;RG = i;CG = j;
-					}
-				}
-			}
-			bfs(RS, CS);
-			if (ans == Integer.MAX_VALUE)
-				sb.append("#").append(TC).append(" GAME OVER\n");
-			else
-				sb.append("#").append(TC).append(" ").append(ans).append("\n");
+		for (int tc = 1; tc < T + 1; tc++) {
+			input();
+			simulation();
+			sb.append("#").append(tc).append(" " ).append(ans==0? "GAME OVER":ans).append("\n");
 		}
 		System.out.println(sb.toString());
 	}
 
-	public static void bfs(int r, int c) {
-		q.clear();int time = 0;
-		q.add(new int[] { r, c, 0 });
-		visited[r][c] = true;
-
-		while (!q.isEmpty()) {
-			int[] k = q.poll();
-			if (k[2] == time) {
-				moveDevil();
-				time++;
-			}
-			if (k[0] == RG && k[1] == CG) {
-				ans = k[2];
-				return;
-			}
-			for (int d = 0; d < 4; d++) {
-				nr = k[0] + dr[d];
-				nc = k[1] + dc[d];
-				if (nr >= 0 && nr < N && nc >= 0 && nc < M) {
-					if (!visited[nr][nc] && map[nr][nc] != -1 && map[nr][nc] != 1) {
-						q.add(new int[] { nr, nc, k[2] + 1 });
-						visited[nr][nc] = true;
+	public static void simulation() {
+		int time = 0;
+		int dq_size, sq_size;
+		while (!sq.isEmpty()) {
+			dq_size = dq.size();
+			// devil
+			for (int i = 0; i < dq_size; i++) {
+				int[] dk = dq.poll();
+				int r = dk[0]; int c =dk[1];
+				for (int d = 0; d < 4; d++) {
+					int nr = r + dr[d];
+					int nc = c + dc[d];
+					if (nr >= 0 && nr < N && nc >= 0 && nc < M && map[nr][nc] == '.') {
+						dq.add(new int[] { nr, nc });
+						map[nr][nc] = '*';
 					}
 				}
 			}
+			sq_size = sq.size();
+			// suyeon
+			for (int i = 0; i < sq_size; i++) {
+				int[] sk = sq.poll();
+				int r = sk[0]; int c =sk[1];	
+				if(r==gr && c==gc) {
+					ans = time;
+					return;
+				}
+				for (int d = 0; d < 4; d++) {
+					int nr = r + dr[d];
+					int nc = c + dc[d];
+					if (nr >= 0 && nr < N && nc >= 0 && nc < M) {
+						if (!visited[nr][nc] && (map[nr][nc] == '.' || map[nr][nc] == 'D')) {
+							visited[nr][nc] = true;
+							sq.add(new int[] { nr, nc });
+						}
+					}
+				}
+			}
+			time++;
 		}
 	}
-
-	public static void moveDevil() {
-		dq.clear();
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < M; j++) {
-				if (map[i][j] == -1) dq.add(new int[] { i, j });
-			}
+	
+	public static void printMap() {
+		System.out.println("+++++++++++++++++++++++++++++");
+		for(int i =0;i<N;i++) {
+			System.out.println(Arrays.toString(map[i]));
 		}
-
-		while (!dq.isEmpty()) {
-			int[] k = dq.poll();
-			for (int d = 0; d < 4; d++) {
-				nr = k[0] + dr[d];
-				nc = k[1] + dc[d];
-				if (nr >= 0 && nr < N && nc >= 0 && nc < M) {
-					if (map[nr][nc] == 0) map[nr][nc] = -1;
+	}
+	
+	public static void input() throws IOException {
+		st = new StringTokenizer(br.readLine());
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
+		map = new char[N][M]; ans = 0;
+		visited = new boolean[N][M];
+		sq.clear(); dq.clear();
+		for (int i = 0; i < N; i++) {
+			String s = br.readLine();
+			for (int j = 0; j < M; j++) {
+				map[i][j] = s.charAt(j);
+				if (map[i][j] == '*') {
+					dq.add(new int[] { i, j });
+				}else if (map[i][j] == 'S') {
+					sq.add(new int[] { i, j });
+					visited[i][j] = true;
+					map[i][j] ='.';
+				} else if (map[i][j] == 'D') {
+					gr = i;
+					gc = j;
 				}
 			}
 		}
