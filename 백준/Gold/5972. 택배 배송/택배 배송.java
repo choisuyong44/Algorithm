@@ -39,7 +39,7 @@ public class Main {
 		while(!pq.isEmpty()) {
 			Node now = pq.poll();
 			if(visited[now.idx]) continue;
-			if(now.idx==N) return;
+            if(now.idx==N) return;
 			visited[now.idx]=true;
 			for(Node next : edge[now.idx]) {
 				if(dist[next.idx] > dist[now.idx]+next.cost) {
