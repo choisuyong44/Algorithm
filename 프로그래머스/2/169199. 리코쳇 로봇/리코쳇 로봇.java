@@ -2,114 +2,83 @@ import java.util.*;
 
 class Solution {
     
+    static int[] dr = {-1, 0, 1, 0};  // 상, 우, 하, 좌 이동
+    static int[] dc = {0, 1, 0, -1};
+    static char[][] map;
+    static int N, M;
+    static int[] R, G;
+    static int answer;
+    static boolean[][] visited;
+    
     public int solution(String[] board) {
+        answer = -1;
         
-        int N = board.length;
-        int M = board[0].length();
-        // System.out.println(N);
-        // System.out.println(M);
+        N = board.length;
+        M = board[0].length();
         
-        int startR = 0, startC = 0;
-        int goalR = 0, goalC = 0;
-        char[][] map = new char[N][M];
-        for (int i = 0; i < N; i++){
-            for (int j = 0; j < M; j++){
-                map[i][j] = board[i].charAt(j);
-                if(map[i][j] == 'R'){
-                    startR = i;
-                    startC = j;
-                } else if(map[i][j] == 'G'){
-                    goalR = i;
-                    goalC = j;
+        map = new char[N][M];
+        R = new int[2];
+        G = new int[2];
+        
+        // 맵 정보 초기화 및 시작점 'R'과 목표점 'G' 위치 저장
+        for(int r = 0; r < N; r++) {
+            for(int c = 0; c < M; c++) {
+                map[r][c] = board[r].charAt(c);
+                if(map[r][c] == 'R') {
+                    R[0] = r; 
+                    R[1] = c;
+                    map[r][c] = '.';  // 'R' 위치를 탐색 가능 상태로 변경
+                }
+                if(map[r][c] == 'G') {
+                    G[0] = r; 
+                    G[1] = c;
                 }
             }
         }
         
-        // System.out.println(startR + " " + startC);
+        bfs();
         
-        int[] dr = {-1, 1, 0, 0};
-        int[] dc = {0, 0, -1, 1};
-        
-        boolean isPoss = false;
-        for (int d = 0; d < 4; d++){
-            int nr = goalR + dr[d];
-            int nc = goalC + dc[d];
-            
-            if(nr < 0 || nr >= N || nc < 0 || nc >= M || map[nr][nc] == 'D') {
-                isPoss = true;
-                break;
-            }
-        }
-        
-        if(!isPoss){
-            return -1;
-        }
-        
-        Queue<int[]> q = new LinkedList<>();
-        for (int d = 0; d < 4; d++){
-            int nr = startR + dr[d];
-            int nc = startC + dc[d];
-            
-            if(nr < 0 || nr >= N || nc < 0 || nc >= M || map[nr][nc] == 'D') continue;
-            
-            q.offer(new int[] {nr, nc, d, 0});
-        }
-        
-        // System.out.println(q);
-        boolean[][] visit = new boolean[N][M];
-        visit[startR][startC] = true;
-        int cnt = -1;
-        // boolean canTouch = false;
-        while(!q.isEmpty()){
-            int[] cur = q.poll();
-            
-            int curR = cur[0];
-            int curC = cur[1];
-            int nextR = curR + dr[cur[2]];
-            int nextC = curC + dc[cur[2]];
-
-            while(nextR >= 0 && nextR < N && nextC >= 0 && nextC < M && map[nextR][nextC] != 'D'){
-                curR = nextR;
-                curC = nextC;
-                nextR = curR + dr[cur[2]];
-                nextC = curC + dc[cur[2]];
-            }
-            
-            if(visit[curR][curC]) continue;
-            
-            cur[3]++;
-            if(map[curR][curC] == 'G') {
-                cnt = cur[3];
-                // canTouch = true;
-                break;
-            }
-            
-            System.out.println(cur[3] + ": " + curR + " " + curC);
-            visit[curR][curC] = true;
-            for (int d = 0; d < 4; d++){
-                int nr = curR + dr[d];
-                int nc = curC + dc[d];
-                
-                if(nr < 0 || nr >= N || nc < 0 || nc >= M || map[nr][nc] == 'D' || visit[nr][nc]) continue;
-                
-                q.offer(new int[] {nr, nc, d, cur[3]});
-            }
-        }
-        
-        return cnt;
+        return answer;
     }
     
-//     static void move(int r, int c, int d){
-//         int curR = r;
-//         int curC = c;
-//         int nextR = curR + dr[d];
-//         int nextC = curC + dc[d];
+    static void bfs() {
+        visited = new boolean[N][M];
+        Queue<int[]> q = new LinkedList<>();
+        q.add(new int[] {R[0], R[1], 0});  // 시작점 (R)에서 시작, 초기 이동 횟수는 0
+        visited[R[0]][R[1]] = true;
         
-//         while(map[nextR][nextC] != 'D'){
-//             curR = nextR;
-//             curC = nextC;
-//             nextR = curR + dr[d];
-//             nextC = curC + dc[d];
-//         }
-//     }
+        while(!q.isEmpty()) {
+            int[] cur = q.poll();
+            int r = cur[0];
+            int c = cur[1];
+            int cnt = cur[2];
+            
+            // 4방향으로 이동
+            for(int i = 0; i < 4; i++) {
+                int nr = r, nc = c;
+                
+                // 벽이나 맵 끝에 닿을 때까지 이동
+                while (nr >= 0 && nc >= 0 && nr < N && nc < M && map[nr][nc] != 'D') {
+                    nr += dr[i];
+                    nc += dc[i];
+                }
+                
+                // 직전 위치로 되돌아감
+                nr -= dr[i];
+                nc -= dc[i];
+                
+                // 목표점에 도달한 경우
+                if(map[nr][nc] == 'G') {
+                    answer = cnt+1;
+                    return;
+                }
+                
+                // 아직 방문하지 않은 곳이면 큐에 추가
+                if (!visited[nr][nc]) {
+                    visited[nr][nc] = true;
+                    q.add(new int[] {nr, nc, cnt + 1});
+                }
+            }
+        }
+    }
 }
