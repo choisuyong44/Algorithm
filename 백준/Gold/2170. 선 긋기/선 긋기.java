@@ -7,7 +7,6 @@ public class Main {
 	static PriorityQueue<int[]> pq = new PriorityQueue<int[]>(new Comparator<int[]>() {
 		@Override
 		public int compare(int[] o1, int[] o2) {
-			if(o1[0]==o2[0]) return o2[1]-o1[1];
 			return o1[0]-o2[0];
 		}
 	});
@@ -16,10 +15,7 @@ public class Main {
 		Scanner sc = new Scanner(System.in);
 		N = sc.nextInt();
 		for(int i=0;i<N;i++) {
-			int a = sc.nextInt();
-			int b = sc.nextInt();
-			if(a>b) pq.add(new int[] {b,a});
-			else pq.add(new int[] {a,b});
+			pq.add(new int[] {sc.nextInt(),sc.nextInt()});
 		}
 		
 		int ans =0;
@@ -31,8 +27,7 @@ public class Main {
 				ans += end-start;
 				start = k[0];
 			}
-			if(k[1] > end) end =k[1];
-
+			end = Math.max(end,k[1]);
 		}		
 		
 		ans += end-start;
