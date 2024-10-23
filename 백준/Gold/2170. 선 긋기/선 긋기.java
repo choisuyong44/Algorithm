@@ -7,15 +7,22 @@ public class Main {
 	static PriorityQueue<int[]> pq = new PriorityQueue<int[]>(new Comparator<int[]>() {
 		@Override
 		public int compare(int[] o1, int[] o2) {
+			if(o1[0]==o2[0]) return o2[1]-o1[1];
 			return o1[0]-o2[0];
 		}
 	});
 	
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		N = sc.nextInt();
+	public static void main(String[] args) throws IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
+		N = Integer.parseInt(br.readLine());
+		
 		for(int i=0;i<N;i++) {
-			pq.add(new int[] {sc.nextInt(),sc.nextInt()});
+			st= new StringTokenizer(br.readLine());
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			if(a>b) pq.add(new int[] {b,a});
+			else pq.add(new int[] {a,b});
 		}
 		
 		int ans =0;
@@ -27,7 +34,8 @@ public class Main {
 				ans += end-start;
 				start = k[0];
 			}
-			end = Math.max(end,k[1]);
+			if(k[1] > end) end =k[1];
+
 		}		
 		
 		ans += end-start;
