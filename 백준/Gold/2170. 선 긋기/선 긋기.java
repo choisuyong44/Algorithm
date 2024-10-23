@@ -17,12 +17,12 @@ public class Main {
 		StringTokenizer st;
 		N = Integer.parseInt(br.readLine());
 		
+		int a,b;
 		for(int i=0;i<N;i++) {
 			st= new StringTokenizer(br.readLine());
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-			if(a>b) pq.add(new int[] {b,a});
-			else pq.add(new int[] {a,b});
+			a = Integer.parseInt(st.nextToken());
+			b = Integer.parseInt(st.nextToken());
+			pq.add(new int[] {a,b});
 		}
 		
 		int ans =0;
@@ -34,8 +34,7 @@ public class Main {
 				ans += end-start;
 				start = k[0];
 			}
-			if(k[1] > end) end =k[1];
-
+			end = Math.max(end, k[1]);
 		}		
 		
 		ans += end-start;
