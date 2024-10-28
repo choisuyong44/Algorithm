@@ -57,12 +57,12 @@ class Solution {
             return true;
         }
         
-        // 대각선
+        // 대각선 \
         if(board[0].charAt(0) == board[1].charAt(1) 
            && board[1].charAt(1) == board[2].charAt(2)
            && board[0].charAt(0) ==c) return true;
         
-        
+        // 대각선 /
         if(board[2].charAt(0) == board[1].charAt(1) 
            && board[1].charAt(1) == board[0].charAt(2)
            && board[2].charAt(0) ==c) return true;
