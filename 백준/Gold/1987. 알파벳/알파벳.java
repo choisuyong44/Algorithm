@@ -33,15 +33,17 @@ public class Main {
 	}
 
 	public static void dfs(int r, int c, int depth) {
+		max = Math.max(max, depth+1);
+		
 		for(int d= 0;d<4;d++) {
 			int nr = r+dr[d];
 			int nc = c+dc[d];
 			if(isValid(nr,nc) && !visited[map[nr][nc]-'A']) {
-				visited[map[nr][nc]-'A'] = true;
+				int k = map[nr][nc] -'A';
+				visited[k] = true;
 				dfs(nr,nc,depth+1);
-				visited[map[nr][nc]-'A'] = false;
+				visited[k] = false;
 			}
-			max = Math.max(max, depth+1);
 		}
 	}
 
