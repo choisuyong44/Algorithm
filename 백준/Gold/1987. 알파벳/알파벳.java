@@ -32,7 +32,7 @@ public class Main {
 		System.out.println(max);
 	}
 
-	public static void dfs(int r, int c, int depth) {
+	static void dfs(int r, int c, int depth) {
 		max = Math.max(max, depth+1);
 		
 		for(int d= 0;d<4;d++) {
@@ -47,7 +47,7 @@ public class Main {
 		}
 	}
 
-	public static boolean isValid(int r, int c) {
+	static boolean isValid(int r, int c) {
 		if (r >= 0 && r < N && c >= 0 && c < M) {
 			return true;
 		}
