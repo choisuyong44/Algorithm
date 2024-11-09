@@ -78,7 +78,8 @@ public class Solution {
               int chargeA = chargers[i].inRange(ax, ay) ? chargers[i].performance : 0;
               int chargeB = chargers[j].inRange(bx, by) ? chargers[j].performance : 0;            	
               // 같은 충전기 사용하는 지 검사
-              int total = (i == j && chargeA >0 && chargeB >0) ? chargeA : chargeA + chargeB;
+              // 실제로 같은 충전을 하고 있는 지 검사
+              int total = (i == j && chargeA == chargeB ) ? chargeA : chargeA + chargeB;
               maxCharge = Math.max(maxCharge,total);
             }
         }
