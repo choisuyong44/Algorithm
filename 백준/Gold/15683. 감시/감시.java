@@ -5,8 +5,8 @@ public class Main {
 
 	static int N, M, nr, nc;
 	static int[][] map;
-	static int ans, max, size;
-	static boolean[][] visited;
+	static int ans, max, sum;
+	static boolean[][] visited,check;
 
 	static int[] dr = { -1, 0, 1, 0 };
 	static int[] dc = { 0, 1, 0, -1 };
@@ -35,7 +35,7 @@ public class Main {
 	}
 
 	static void dfs(int depth) {
-		if (depth == size) {
+		if (depth == list.size()) {
 			updateVisible();
 			return;
 		}
@@ -50,93 +50,60 @@ public class Main {
 	}
 
 	static void updateVisible() {
-		boolean[][] check = new boolean[N][M];
+		check = new boolean[N][M];
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < M; j++) {
 				check[i][j] = visited[i][j];
 			}
 		}
-		int sum = 0;
+		sum = 0;
 		for (CCTV cctv : list) {
 			if (cctv.type == 1) {
-				nr = cctv.r;
-				nc = cctv.c;
-				while (true) {
-					nr = nr + dr[cctv.dir];
-					nc = nc + dc[cctv.dir];
-					if (!isValid(nr, nc)) break;
-					if (!check[nr][nc]) {
-						check[nr][nc] = true;
-						sum++;
-					}
-				}
+				sum += cntVisible(cctv,0);
 			}
 
 			else if (cctv.type == 2) {
 				for (int d = 0; d < 3; d += 2) {
-					nr = cctv.r;
-					nc = cctv.c;
-					while (true) {
-						nr = nr + dr[(cctv.dir + d) % 4];
-						nc = nc + dc[(cctv.dir + d) % 4];
-						if (!isValid(nr, nc)) break;
-						if (!check[nr][nc]) {
-							check[nr][nc] = true;
-							sum++;
-						}
-					}
+					sum += cntVisible(cctv,d);
 				}
 			}
 
 			else if (cctv.type == 3) {
 				for (int d = 0; d < 2; d++) {
-					nr = cctv.r;
-					nc = cctv.c;
-					while (true) {
-						nr = nr + dr[(cctv.dir + d) % 4];
-						nc = nc + dc[(cctv.dir + d) % 4];
-						if (!isValid(nr, nc)) break;
-						if (!check[nr][nc]) {
-							check[nr][nc] = true;
-							sum++;
-						}
-					}
+					sum +=cntVisible(cctv, d);
 				}
 			}
 
 			else if (cctv.type == 4) {
-				for (int d = -1; d < 2; d++) {
-					nr = cctv.r;
-					nc = cctv.c;
-					while (true) {
-						nr = nr + dr[(4 + cctv.dir + d) % 4];
-						nc = nc + dc[(4 + cctv.dir + d) % 4];
-						if (!isValid(nr, nc)) break;
-						if (!check[nr][nc]) {
-							check[nr][nc] = true;
-							sum++;
-						}
-					}
+				for (int d = 0; d < 3; d++) {
+					sum +=cntVisible(cctv, d);
+
 				}
 			}
 
 			else if (cctv.type == 5) {
 				for (int d = 0; d < 4; d++) {
-					nr = cctv.r;
-					nc = cctv.c;
-					while (true) {
-						nr = nr + dr[d % 4];
-						nc = nc + dc[d % 4];
-						if (!isValid(nr, nc)) break;
-						if (!check[nr][nc]) {
-							check[nr][nc] = true;
-							sum++;
-						}
-					}
+					sum +=cntVisible(cctv, d);
 				}
 			}
 		}
 		max = Math.max(sum, max);
+	}
+	
+	static int cntVisible(CCTV cctv, int d) {
+		int cnt =0;
+		nr = cctv.r;
+		nc = cctv.c;
+		while (true) {
+			nr = nr + dr[(cctv.dir + d) % 4];
+			nc = nc + dc[(cctv.dir + d) % 4];
+			if (!isValid(nr, nc)) break;
+			if (!check[nr][nc]) {
+				check[nr][nc] = true;
+				cnt++;
+			}
+		}
+		return cnt;
 	}
 
 	static boolean isValid(int r, int c) {
@@ -165,6 +132,5 @@ public class Main {
 				else visited[i][j] = true;
 			}
 		}
-		size = list.size();
 	}
 }
