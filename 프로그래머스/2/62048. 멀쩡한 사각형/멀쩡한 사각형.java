@@ -6,10 +6,11 @@ class Solution {
     public long solution(int w, int h) {
         long answer = (long)w*h;
         
-        // 최대공약수 구하기
+        // 1. 최대공약수 구하기
         k = gcd(w,h);
         
-        // 가로세로 비율구하기
+        // 2. 최소 가로세로 비율구하기
+        // 여기
         long sub = (w / k) + (h / k) - 1;
         
         // answer = answer - 
