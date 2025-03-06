@@ -18,9 +18,8 @@ public class Main {
 	static int N,M,cost,x,y,z;
 	static List<Node>[] list;
 	static boolean[] visited;
-	static PriorityQueue<Node> pq = new PriorityQueue<>();
-	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-	
+	static PriorityQueue<Node> pq = new PriorityQueue();
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	public static void main(String[] args) throws IOException{
 		while(input()) {
 			simulation();
@@ -62,7 +61,6 @@ public class Main {
 	
 	static boolean input() throws IOException{
 		StringTokenizer st = new StringTokenizer(br.readLine());
-		
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
 		
@@ -86,7 +84,7 @@ public class Main {
 			list[y].add(new Node(x,z));
 			cost += z;
 		}
-		
+
 		return true;
 	}
 }
