@@ -2,89 +2,97 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
+    static class Edge implements Comparable<Edge> {
+        int src,dest,dist;
+        public Edge(int src,int dest, int dist) {
+            this.src = src;
+            this.dest = dest;
+            this.dist = dist;
+        }
+        @Override
+        public int compareTo(Edge o) {
+            return dist - o.dist;
+        }
+        @Override
+        public String toString() {
+            return "Node [src=" + src + ", dest=" + dest + ", dist=" + dist + "]";
+        }
+    }
 
-	static class Node implements Comparable<Node>{
-		int idx;
-		int dist;
-		public Node(int idx, int dist) {
-			this.idx = idx;
-			this.dist = dist;
-		}
-		@Override
-		public int compareTo(Node o) {
-			return this.dist-o.dist;
-		}
-	}
-	static int N,M,cost,x,y,z;
-	static List<Node>[] list;
-	static boolean[] visited;
-	static PriorityQueue<Node> pq = new PriorityQueue();
+    static int N,M,ANS,CNT;
+    static PriorityQueue<Edge> pq;
+    static boolean[] visited;
+    static int[] parent;
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-	public static void main(String[] args) throws IOException{
-		while(input()) {
-			simulation();
-		}
-	}
-	
-	static void simulation() {
-		pq.clear();
-		pq.add(new Node(0,0));
-		
-		while(!pq.isEmpty()) {
-			Node k = pq.poll();
-			
-			if(visited[k.idx]) continue;
-			visited[k.idx] = true;
-			cost -= k.dist;
-			if((--N)<=0) break;
- 			
-			for(Node next : list[k.idx]) {
-				if(visited[next.idx]) continue;
-				pq.add(next);
-			}
-		}
-		
-		System.out.println(cost);
-	}
-	
-//	static void union(int x, int y) {
-//		x = find(x);
-//		y = find(y);
-//		if(x>y) parent[y] = x;
-//		else parent[x] = y;
-//	}
-//	
-//	static int find(int x) {
-//		if(x == parent[x]) return x;
-//		else return parent[x] = find(parent[x]);
-//	}
-	
-	static boolean input() throws IOException{
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		
-		if(N ==0 && M == 0) return false;
-		
-		visited = new boolean[N];
-		list = new List[N];
-		cost =0;
-		
-		for(int i =0;i<N;i++) {
-			list[i] = new ArrayList<Node>();
-		}
-		
-		for(int i =0;i<M;i++) {
-			st = new StringTokenizer(br.readLine());
-			x = Integer.parseInt(st.nextToken());
-			y = Integer.parseInt(st.nextToken());
-			z = Integer.parseInt(st.nextToken());
-			
-			list[x].add(new Node(y,z));
-			list[y].add(new Node(x,z));
-			cost += z;
-		}
 
-		return true;
-	}
+    public static void main(String[] args) throws IOException {
+        while(input()){
+            simluation();
+        }
+    }
+
+    static void simluation(){
+        while(!pq.isEmpty()){
+            Edge now = pq.poll();
+
+            if(CNT==0) break;
+
+            if(find(now.src) != find(now.dest)){
+                union(now.src,now.dest);
+                ANS -= now.dist;
+                CNT--;
+            }
+        }
+        System.out.println(ANS);
+    }
+
+    static void union(int x, int y){
+        x = find(x);
+        y = find(y);
+        if(x>=y) parent[y] = x;
+        else parent[x] = y;
+    }
+
+    static int find(int x){
+        if(x==parent[x]) return x;
+        return parent[x] = find(parent[x]);
+    }
+
+    static boolean input() throws IOException {
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        pq = new PriorityQueue<Edge>();
+
+        // 집의 수
+        N = Integer.parseInt(st.nextToken());
+        // 길의 수
+        M = Integer.parseInt(st.nextToken());
+
+        // ANS
+        ANS = 0;
+        // 개수
+        CNT = N-1;
+
+        if (N==0 && M ==0) return false;
+
+        visited = new boolean[N];
+        parent = new int[N];
+
+        for(int i = 0; i < N; i++){
+            parent[i] = i;
+        }
+
+        for (int i = 0; i < M; i++) {
+            st = new StringTokenizer(br.readLine());
+
+            int x = Integer.parseInt(st.nextToken());
+            int y = Integer.parseInt(st.nextToken());
+            int z = Integer.parseInt(st.nextToken());
+
+            pq.add(new Edge(x, y, z));
+
+            ANS += z;
+        }
+
+        return true;
+    }
 }
